@@ -1,0 +1,256 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Device Fingerprinting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #info {
+            margin-top: 20px;
+        }
+        .info-item {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Device Fingerprinting</h1>
+    <div id="info">Loading device details...<div class="info-item">User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.140 Safari/537.36</div><div class="info-item">Platform: MacIntel</div><div class="info-item">Languages: en-US</div><div class="info-item">Cookies Enabled: true</div><div class="info-item">DNT Header Enabled: No</div><div class="info-item">Screen Resolution: 1512x982</div><div class="info-item">Color Depth: 30</div><div class="info-item">Pixel Ratio: 2</div><div class="info-item">Device Memory (GB): 8</div><div class="info-item">Estimated Device Memory: 16 GB or higher</div><div class="info-item">Hardware Concurrency: 10</div><div class="info-item">Battery Level: 48%</div><div class="info-item">Charging: Yes</div><div class="info-item">Connection Type: 3g</div><div class="info-item">Downlink Speed: 1.3 Mbps</div><div class="info-item">Timezone: Africa/Cairo</div><div class="info-item">Time Zone Offset: -120 minutes</div><div class="info-item">Locale: en-US</div><div class="info-item">Detected Fonts: Arial, Courier New, Georgia, Times New Roman, Verdana</div><div class="info-item">Advanced Canvas Fingerprint: -653626046</div><div class="info-item">Audio Fingerprint: Infinity</div><div class="info-item">Mime Types: application/pdf, application/x-google-chrome-pdf</div><div class="info-item">Plugins: Chromium PDF Plugin, Chromium PDF Viewer</div><div class="info-item">Ad Blocker: Not Detected</div><div class="info-item">User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.140 Safari/537.36</div><div class="info-item">Platform: MacIntel</div><div class="info-item">Languages: en-US</div><div class="info-item">Cookies Enabled: true</div><div class="info-item">DNT Header Enabled: No</div><div class="info-item">Screen Resolution: 1512x982</div><div class="info-item">Color Depth: 30</div><div class="info-item">Pixel Ratio: 2</div><div class="info-item">Device Memory (GB): 8</div><div class="info-item">Estimated Device Memory: 16 GB or higher</div><div class="info-item">Hardware Concurrency: 10</div><div class="info-item">Battery Level: 56%</div><div class="info-item">Charging: No</div><div class="info-item">Connection Type: 3g</div><div class="info-item">Downlink Speed: 1.2 Mbps</div><div class="info-item">Timezone: Africa/Cairo</div><div class="info-item">Time Zone Offset: -120 minutes</div><div class="info-item">Locale: en-US</div><div class="info-item">Detected Fonts: Arial, Courier New, Georgia, Times New Roman, Verdana</div><div class="info-item">Advanced Canvas Fingerprint: -653626046</div><div class="info-item">Audio Fingerprint: Infinity</div><div class="info-item">Mime Types: application/pdf, text/pdf</div><div class="info-item">Plugins: PDF Viewer, Chrome PDF Viewer, Chromium PDF Viewer, Microsoft Edge PDF Viewer, WebKit built-in PDF</div><div class="info-item">Ad Blocker: Not Detected</div></div>
+
+    <script>
+        function addInfoItem(label, value) {
+            const infoDiv = document.getElementById('info');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'info-item';
+            itemDiv.textContent = `${label}: ${value}`;
+            infoDiv.appendChild(itemDiv);
+        }
+
+        async function estimateDeviceMemory() {
+            // Run a lightweight performance test to estimate memory indirectly
+            const iterations = 100000;
+            const start = performance.now();
+            let sum = 0;
+            for (let i = 0; i < iterations; i++) {
+                sum += Math.sqrt(i);
+            }
+            const duration = performance.now() - start;
+
+            // Infer memory based on the duration (heuristic values)
+            if (duration < 50) {
+                return '16 GB or higher';
+            } else if (duration < 100) {
+                return '8-16 GB';
+            } else if (duration < 200) {
+                return '4-8 GB';
+            } else {
+                return 'Less than 4 GB';
+            }
+        }
+
+        async function collectDeviceInfo() {
+            // WebRTC Local IP Detection
+            if (window.RTCPeerConnection) {
+                try {
+                    const pc = new RTCPeerConnection({ iceServers: [] });
+                    pc.createDataChannel('test');
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                    pc.onicecandidate = event => {
+                        if (event && event.candidate && event.candidate.candidate) {
+                            const ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
+                            const match = event.candidate.candidate.match(ipRegex);
+                            if (match) {
+                                addInfoItem('WebRTC Local IP', match[0]);
+                                pc.close();
+                            }
+                        }
+                    };
+                } catch (e) {
+                    addInfoItem('WebRTC Info', 'Error: ' + e.message);
+                }
+            } else {
+                addInfoItem('WebRTC Info', 'Not Supported');
+            }
+
+            // Browser Characteristics
+            addInfoItem('User Agent', navigator.userAgent);
+            addInfoItem('Platform', navigator.platform);
+            addInfoItem('Languages', navigator.languages.join(', '));
+            addInfoItem('Cookies Enabled', navigator.cookieEnabled);
+            addInfoItem('DNT Header Enabled', navigator.doNotTrack === '1' ? 'Yes' : 'No');
+
+            // Screen Properties
+            addInfoItem('Screen Resolution', `${screen.width}x${screen.height}`);
+            addInfoItem('Color Depth', screen.colorDepth);
+            addInfoItem('Pixel Ratio', window.devicePixelRatio);
+
+            // System Information
+            if (navigator.deviceMemory) {
+                addInfoItem('Device Memory (GB)', navigator.deviceMemory);
+            }
+
+            const estimatedMemory = await estimateDeviceMemory();
+            addInfoItem('Estimated Device Memory', estimatedMemory);
+
+            if (navigator.hardwareConcurrency) {
+                addInfoItem('Hardware Concurrency', navigator.hardwareConcurrency);
+            }
+
+            // Battery Information
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    addInfoItem('Battery Level', `${Math.round(battery.level * 100)}%`);
+                    addInfoItem('Charging', battery.charging ? 'Yes' : 'No');
+                } catch (e) {
+                    addInfoItem('Battery Info', 'Unavailable');
+                }
+            } else {
+                addInfoItem('Battery Info', 'Not Supported');
+            }
+
+            // Network Information
+            if (navigator.connection) {
+                addInfoItem('Connection Type', navigator.connection.effectiveType);
+                addInfoItem('Downlink Speed', `${navigator.connection.downlink} Mbps`);
+            } else {
+                addInfoItem('Network Info', 'Not Available');
+            }
+
+            // Timezone and Locale
+            addInfoItem('Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            addInfoItem('Time Zone Offset', new Date().getTimezoneOffset() + ' minutes');
+            addInfoItem('Locale', Intl.DateTimeFormat().resolvedOptions().locale);
+
+            // Font Detection via Canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const defaultFont = 'monospace';
+            const testFonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'];
+            const detectedFonts = [];
+
+            ctx.font = `16px ${defaultFont}`;
+            const defaultWidth = ctx.measureText('abcdefghijklmnopqrstuvwxyz0123456789').width;
+
+            testFonts.forEach(font => {
+                ctx.font = `16px ${font}, ${defaultFont}`;
+                const testWidth = ctx.measureText('abcdefghijklmnopqrstuvwxyz0123456789').width;
+                if (testWidth !== defaultWidth) {
+                    detectedFonts.push(font);
+                }
+            });
+
+            addInfoItem('Detected Fonts', detectedFonts.join(', ') || 'None');
+
+            // Advanced Canvas Fingerprint
+            ctx.textBaseline = 'top';
+            ctx.font = '16px "Courier New"';
+            ctx.fillStyle = '#f60';
+            ctx.fillRect(50, 50, 150, 150);
+            ctx.fillStyle = '#069';
+            ctx.fillText('Advanced Fingerprint', 10, 10);
+            ctx.arc(75, 75, 50, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let canvasHash = 0;
+            for (let i = 0; i < imageData.data.length; i++) {
+                canvasHash = (canvasHash << 5) - canvasHash + imageData.data[i];
+                canvasHash |= 0;
+            }
+
+            addInfoItem('Advanced Canvas Fingerprint', canvasHash);
+
+            // WebGL Fingerprint
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    addInfoItem('WebGL Vendor', gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL));
+                    addInfoItem('WebGL Renderer', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
+                }
+            }
+
+            // Audio Fingerprint
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const analyser = audioCtx.createAnalyser();
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+                oscillator.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                oscillator.start(0);
+                const dataArray = new Float32Array(analyser.fftSize);
+                analyser.getFloatFrequencyData(dataArray);
+                const audioHash = dataArray.reduce((acc, value) => acc + Math.abs(value), 0);
+                addInfoItem('Audio Fingerprint', audioHash);
+                oscillator.stop();
+            } catch (e) {
+                addInfoItem('Audio Fingerprint', 'Unavailable');
+            }
+
+            // Ad Blocker Detection
+            const bait = document.createElement('div');
+            bait.innerHTML = '&nbsp;';
+            bait.className = 'adsbox';
+            bait.style.position = 'absolute';
+            bait.style.top = '-9999px';
+            document.body.appendChild(bait);
+
+            setTimeout(() => {
+                if (bait.offsetHeight === 0) {
+                    addInfoItem('Ad Blocker', 'Detected');
+                } else {
+                    addInfoItem('Ad Blocker', 'Not Detected');
+                }
+                document.body.removeChild(bait);
+            }, 100);
+
+            // Plugins and MIME Types
+            const mimeTypes = Array.from(navigator.mimeTypes).map(mt => mt.type).join(', ');
+            const plugins = Array.from(navigator.plugins).map(p => p.name).join(', ');
+            addInfoItem('Mime Types', mimeTypes || 'None');
+            addInfoItem('Plugins', plugins || 'None');
+        }
+
+        collectDeviceInfo();
+    </script>
+<script>
+    async function sendToGoogleSheets(data) {
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbzV4kppEwnOCIVQos7W9XQ6eiWO2XnxmOz39Zf0fttM/dev'; // Replace with your Web App URL
+        try {
+            const response = await fetch(webAppUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            console.log(result);
+        } catch (error) {
+            console.error('Error sending data to Google Sheets:', error);
+        }
+    }
+
+    async function collectAndSendDeviceInfo() {
+        const deviceInfo = {};
+        const infoItems = document.querySelectorAll('.info-item');
+        infoItems.forEach(item => {
+            const [key, value] = item.textContent.split(': ');
+            deviceInfo[key] = value;
+        });
+
+        await sendToGoogleSheets(deviceInfo);
+    }
+
+    document.addEventListener('DOMContentLoaded', collectAndSendDeviceInfo);
+</script>
+
+
+
+</body></html>
